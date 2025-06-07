@@ -1,8 +1,8 @@
 import {useDroppable} from "@dnd-kit/core";
-import {Box, Typography} from "@mui/material";
+import {Box, Paper, Typography} from "@mui/material";
 import JobCard from "@/components/JobCard";
 
-export default function StatusBoard({status}: { status: number }) {
+export default function StatusBoard({status}: { status: string }) {
     const {isOver, setNodeRef} = useDroppable({
         id: status,
     });
@@ -12,21 +12,32 @@ export default function StatusBoard({status}: { status: number }) {
 
 
     return (
-        <Box component="div" ref={setNodeRef}
-             sx={{
-                 mx: 2,
-                 my: 1,
-                 display: 'flex',
-                 flexDirection: 'column',
-                 justifyContent: 'center',
-                 alignItems: 'center',
-                 ...style
-             }}>
-            <Typography variant="h5">
+        <Paper component="div" ref={setNodeRef}
+               sx={{
+                   mx: 1.5,
+                   my: 2,
+                   px: 2,
+                   py: 1,
+                   display: 'flex',
+                   flexDirection: 'column',
+                   justifyContent: 'start',
+                   alignItems: 'center',
+                   elevation: 2,
+                   minHeight: 500,
+                   ...style
+               }}>
+
+            <Typography variant="h6" sx={{
+                color: 'text.primary',
+                display: '-webkit-box',
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: 'vertical',
+
+            }}>
                 {status}
             </Typography>
-            <JobCard status={status} id={1}/>
-            <JobCard status={status} id={2}/>
-        </Box>
+            <JobCard status={1} id={1}/>
+            <JobCard status={2} id={2}/>
+        </Paper>
     );
 }

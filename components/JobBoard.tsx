@@ -18,15 +18,14 @@ export default function JobBoard() {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            border: 1,
-            borderRadius: 4,
         }}>
             <DndContext onDragEnd={handleDragEnd}>
-                <StatusBoard status={1}/>
-                <StatusBoard status={2}/>
-                {/*<StatusBoard status="นัดสัม"/>*/}
-                {/*<StatusBoard status="สัมแล้ว"/>*/}
-                {/*<StatusBoard status="ผ่าน"/>*/}
+                <StatusBoard status="รอยื่น"/>
+                <StatusBoard status="สมัครแล้ว"/>
+                <StatusBoard status="นัดสัมภาษณ์"/>
+                <StatusBoard status="สัมภาษณ์แล้ว"/>
+                <StatusBoard status="ผ่าน"/>
+                <StatusBoard status="ไม่ผ่าน"/>
             </DndContext>
         </Box>
     );

@@ -14,7 +14,7 @@ export default function JobCard({status, id}: { status: number, id: number }) {
         <Card variant="outlined" ref={setNodeRef} component="div" {...listeners} {...attributes} sx={{
             mx: 2,
             my: 1,
-            minWidth: 275,
+            width: '100%',
             ...style
         }}>
             <CardContent>

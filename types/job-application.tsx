@@ -18,6 +18,12 @@ export const ApplicationStatusText: Record<ApplicationStatus, string> = {
     [ApplicationStatus.FAILED]: 'ไม่ผ่าน',
 };
 
+export function getApplicationStatusValues(): ApplicationStatus[] {
+    return Object.values(ApplicationStatus).filter(
+        (value) => typeof value === 'number'
+    ) as ApplicationStatus[];
+}
+
 export function getJobApplicationStatusTitle(application: JobApplication): string {
     return ApplicationStatusText[application.status] || 'ไม่ทราบสถานะ';
 }
@@ -26,6 +32,7 @@ export interface JobApplication {
     id: string,
     job: Job
     status: ApplicationStatus,
+    index: number,
     createdAt: Date,
     updatedAt: Date,
 }

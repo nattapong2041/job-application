@@ -1,8 +1,13 @@
 import {useDroppable} from "@dnd-kit/core";
-import {Box, Paper, Typography} from "@mui/material";
+import {Paper, Typography} from "@mui/material";
 import JobCard from "@/components/JobCard";
+import {ApplicationStatus, ApplicationStatusText, JobApplication} from "@/types";
 
-export default function StatusBoard({status}: { status: string }) {
+type StatusBoardProps = {
+    status: ApplicationStatus,
+    application: JobApplication[]
+}
+export default function StatusBoard({status, application}: StatusBoardProps) {
     const {isOver, setNodeRef} = useDroppable({
         id: status,
     });
@@ -32,10 +37,11 @@ export default function StatusBoard({status}: { status: string }) {
                 WebkitBoxOrient: 'vertical',
 
             }}>
-                {status}
+                {ApplicationStatusText[status]}
             </Typography>
-            <JobCard status={1} id={1}/>
-            <JobCard status={2} id={2}/>
+            {application.map((app) =>
+                (<JobCard key={app.id} application={app}/>
+                ))}
         </Paper>
     );
 }

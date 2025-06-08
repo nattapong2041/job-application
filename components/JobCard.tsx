@@ -2,11 +2,12 @@
 
 import {useDraggable} from "@dnd-kit/core";
 import {Button, Card, CardActions, CardContent, Chip, Typography} from "@mui/material";
+import {JobApplication} from "@/types";
 
 
-export default function JobCard({status, id}: { status: number, id: number }) {
+export default function JobCard({application}: { application: JobApplication }) {
     const {attributes, listeners, setNodeRef, transform} = useDraggable({
-        id: id,
+        id: application.id,
     });
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
@@ -20,10 +21,10 @@ export default function JobCard({status, id}: { status: number, id: number }) {
         }}>
             <CardContent>
                 <Typography gutterBottom variant="subtitle1" component="div">
-                    Lineman Wongnai id{id}
+                    {application.job.company}
                 </Typography>
                 <Typography variant="body1" sx={{color: 'text.secondary'}}>
-                    UX/UI Designer
+                    {application.job.title}
                 </Typography>
             </CardContent>
             <CardActions sx={{justifyContent: 'space-between',}}>

@@ -1,7 +1,8 @@
 'use client'
 
 import {useDraggable} from "@dnd-kit/core";
-import {Card, CardContent, CardHeader, Typography} from "@mui/material";
+import {Button, Card, CardActions, CardContent, Chip, Typography} from "@mui/material";
+
 
 export default function JobCard({status, id}: { status: number, id: number }) {
     const {attributes, listeners, setNodeRef, transform} = useDraggable({
@@ -17,19 +18,18 @@ export default function JobCard({status, id}: { status: number, id: number }) {
             width: '100%',
             ...style
         }}>
-            <CardHeader>
-                <Typography variant="h6">
-                    Job Card
-                </Typography>
-            </CardHeader>
             <CardContent>
-                <Typography variant="subtitle1" sx={{color: 'text.secondary'}}>
+                <Typography gutterBottom variant="subtitle1" component="div">
                     Lineman Wongnai id{id}
                 </Typography>
                 <Typography variant="body1" sx={{color: 'text.secondary'}}>
-                    สถานะ {status}
+                    UX/UI Designer
                 </Typography>
             </CardContent>
+            <CardActions sx={{justifyContent: 'space-between',}}>
+                <Chip label="2 days ago" size="small" color='info' />
+                <Button size="small">เพิ่มเติม</Button>
+            </CardActions>
         </Card>
     )
 }

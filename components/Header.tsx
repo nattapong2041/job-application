@@ -3,13 +3,14 @@
 import {Box, IconButton, Typography} from "@mui/material";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import {auth} from "@/app/firebase";
+import {FirebaseError} from "firebase/app";
 
 export default function Header() {
     const signOutUser = async () => {
         try {
             await auth.signOut();
-        } catch (err: any) {
-            console.error("Error signing out:", err);
+        } catch (err: unknown) { // Explicitly type err as unknown
+            console.error("Error signing in with Google:", err);
         }
     }
     return (<Box sx={{

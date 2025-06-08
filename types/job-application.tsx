@@ -32,7 +32,6 @@ export interface JobApplication {
     id: string,
     job: Job
     status: ApplicationStatus,
-    index: number,
     createdAt: Date,
     updatedAt: Date,
 }

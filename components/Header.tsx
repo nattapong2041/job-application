@@ -3,7 +3,6 @@
 import {Box, IconButton, Typography} from "@mui/material";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import {auth} from "@/app/firebase";
-import {FirebaseError} from "firebase/app";
 
 export default function Header() {
     const signOutUser = async () => {

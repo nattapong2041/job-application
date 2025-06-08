@@ -12,18 +12,16 @@ export default function StatusBoard({status}: { status: string }) {
 
 
     return (
-        <Paper component="div" ref={setNodeRef}
+        <Paper component="div" elevation={1} ref={setNodeRef}
                sx={{
-                   mx: 1.5,
-                   my: 2,
                    px: 2,
                    py: 1,
                    display: 'flex',
                    flexDirection: 'column',
                    justifyContent: 'start',
                    alignItems: 'center',
-                   elevation: 2,
                    minHeight: 500,
+                   minWidth: 250,
                    ...style
                }}>
 

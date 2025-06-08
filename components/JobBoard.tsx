@@ -14,10 +14,15 @@ export default function JobBoard() {
     return (
         <Box component="section" sx={{
             my: 4,
+            maxWidth: '100%',
+            mx: 'auto',
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            overflowX: 'auto',
+            gap: 2,
+            p: 2,
         }}>
             <DndContext onDragEnd={handleDragEnd}>
                 <StatusBoard status="รอยื่น"/>

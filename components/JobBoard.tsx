@@ -248,7 +248,7 @@ export default function JobBoard() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>ยกเลิก</Button>
-                    <Button type="submit" variant="contained">สร้างใบสมัคร</Button>
+                    <Button type="submit" variant="contained">สร้าง</Button>
                 </DialogActions>
             </Dialog>
         );

@@ -24,10 +24,6 @@ export function getApplicationStatusValues(): ApplicationStatus[] {
     ) as ApplicationStatus[];
 }
 
-export function getJobApplicationStatusTitle(application: JobApplication): string {
-    return ApplicationStatusText[application.status] || 'ไม่ทราบสถานะ';
-}
-
 export interface JobApplication {
     id: string,
     job: Job

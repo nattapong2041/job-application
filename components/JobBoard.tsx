@@ -15,6 +15,14 @@ import StatusBoard from "@/components/StatusBoard";
 import {ApplicationStatus, getApplicationStatusValues, Job, JobApplication} from "@/types";
 import {FormEvent, useState} from "react";
 
+interface JobFormData {
+    title: string;
+    description: string;
+    company: string;
+    url: string;
+}
+
+
 export default function JobBoard() {
     const allStatuses = getApplicationStatusValues();
     const jobs: Job[] = [
@@ -153,6 +161,28 @@ export default function JobBoard() {
         </Box>
     );
 
+    function createJob(formData: FormData) {
+        const formEntries = Object.fromEntries(formData.entries()) as Record<keyof JobFormData, string>;
+
+        const newJob: Job = {
+            title: formEntries.title,
+            description: formEntries.description,
+            company: formEntries.company,
+            url: formEntries.url,
+        };
+
+        const newApplication: JobApplication = {
+            id: `app-${Date.now()}`,
+            job: newJob,
+            status: ApplicationStatus.PENDING,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        setApplications(prevApplications => [...prevApplications, newApplication]);
+    }
+
+
     function JobCreateDialog() {
         return (
             <Dialog open={openCreate} onClose={handleClose} slotProps={{
@@ -161,23 +191,9 @@ export default function JobBoard() {
                     onSubmit: (event: FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries((formData as any).entries());
-
-                        const newApplication: JobApplication = {
-                            id: `app-${Date.now()}`,
-                            job: {
-                                title: formJson.title,
-                                description: formJson.description,
-                                company: formJson.company,
-                                url: formJson.url
-                            },
-                            status: ApplicationStatus.PENDING,
-                            createdAt: new Date(),
-                            updatedAt: new Date()
-                        };
-
-                        setApplications(prev => [...prev, newApplication]);
+                        createJob(formData);
                         handleClose();
+
                     },
                 },
             }}>

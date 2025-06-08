@@ -5,6 +5,7 @@ import { GoogleAuthProvider, signInWithPopup, User, onAuthStateChanged } from 'f
 import { Button, Typography, Container, Paper, Box, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {auth} from "@/app/firebase"; // For redirecting after login
+import { FirebaseError } from 'firebase/app'; // Import FirebaseError
 
 export default function LoginPage() {
     const [user, setUser] = useState<User | null>(null);
@@ -33,9 +34,15 @@ export default function LoginPage() {
             // You can redirect the user to another page after successful login
             // For example, router.push('/dashboard');
             console.log('Successfully signed in with Google:', result.user);
-        } catch (err: any) {
+        } catch (err: unknown) { // Explicitly type err as unknown
             console.error("Error signing in with Google:", err);
-            setError(err.message || 'Failed to sign in with Google. Please try again.');
+            if (err instanceof FirebaseError) {
+                setError(err.message || 'Failed to sign in with Google. Please try again.');
+            } else if (err instanceof Error) { // Handle generic errors
+                setError(err.message || 'An unexpected error occurred.');
+            } else {
+                setError('An unknown error occurred. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -46,9 +53,15 @@ export default function LoginPage() {
         try {
             await auth.signOut();
             setUser(null);
-        } catch (err: any) {
+        } catch (err: unknown) { // Explicitly type err as unknown
             console.error("Error signing out:", err);
-            setError(err.message || 'Failed to sign out.');
+            if (err instanceof FirebaseError) {
+                setError(err.message || 'Failed to sign out.');
+            } else if (err instanceof Error) { // Handle generic errors
+                setError(err.message || 'An unexpected error occurred during sign out.');
+            } else {
+                setError('An unknown error occurred during sign out.');
+            }
         } finally {
             setLoading(false);
         }

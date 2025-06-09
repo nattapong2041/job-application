@@ -4,9 +4,9 @@ import Header from "@/components/Header";
 import {Box, Container} from "@mui/material";
 import JobBoard from "@/components/JobBoard";
 import {onAuthStateChanged} from "firebase/auth";
-import {auth} from "@/app/firebase";
 import { useRouter } from 'next/navigation';
 import {useEffect} from "react";
+import {auth} from "@/firebase/firebase";
 
 export default function Home() {
     const router = useRouter();

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { GoogleAuthProvider, signInWithPopup, User, onAuthStateChanged } from 'firebase/auth';
 import { Button, Typography, Container, Paper, Box, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {auth} from "@/app/firebase"; // For redirecting after login
+import {auth} from "@/firebase/firebase"; // For redirecting after login
 import { FirebaseError } from 'firebase/app'; // Import FirebaseError
 
 export default function LoginPage() {

@@ -13,7 +13,10 @@ import {
 import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import StatusBoard from "@/components/StatusBoard";
 import {ApplicationStatus, getApplicationStatusValues, Job, JobApplication} from "@/types";
-import {FormEvent, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
+import {createJob, getApplications} from "@/firebase/firestore-service";
+import {onAuthStateChanged, User} from "firebase/auth";
+import {auth} from "@/firebase/firebase";
 
 interface JobFormData {
     title: string;
@@ -25,79 +28,34 @@ interface JobFormData {
 
 export default function JobBoard() {
     const allStatuses = getApplicationStatusValues();
-    const jobs: Job[] = [
-        {
-            title: "Software Engineer",
-            description: "Develop and maintain web applications.",
-            company: "Tech Innovations Inc.",
-            url: "https://techinnovations.com/careers/se",
-        },
-        {
-            title: "UX/UI Designer",
-            description: "Design user-friendly interfaces.",
-            company: "Creative Solutions Co.",
-            url: "https://creativesolutions.com/jobs/designer",
-        },
-        {
-            title: "Data Analyst",
-            description: "Analyze large datasets and provide insights.",
-            company: "Data Insights Ltd.",
-            url: "https://datainsights.co/careers/data-analyst",
-        },
-        {
-            title: "Product Manager",
-            description: "Lead product development from conception to launch.",
-            company: "Innovate Global",
-            url: "https://innovateglobal.com/pm-role",
-        },
-    ];
-
     const [openCreate, setOpenCreate] = useState(false);
-    const [applications, setApplications] = useState<JobApplication[]>
-    ([
-        {
-            id: "app-001",
-            job: jobs[0], // Software Engineer
-            status: ApplicationStatus.PENDING,
-            createdAt: new Date("2025-05-20T10:00:00Z"),
-            updatedAt: new Date("2025-05-20T10:00:00Z"),
-        },
-        {
-            id: "app-002",
-            job: jobs[1], // UX/UI Designer
-            status: ApplicationStatus.SCHEDULED_INTERVIEW,
-            createdAt: new Date("2025-05-15T11:30:00Z"),
-            updatedAt: new Date("2025-06-01T14:00:00Z"),
-        },
-        {
-            id: "app-003",
-            job: jobs[2], // Data Analyst
-            status: ApplicationStatus.PENDING,
-            createdAt: new Date("2025-06-05T09:15:00Z"),
-            updatedAt: new Date("2025-06-05T09:15:00Z"),
-        },
-        {
-            id: "app-004",
-            job: jobs[0], // Software Engineer (อีกใบ)
-            status: ApplicationStatus.INTERVIEWED,
-            createdAt: new Date("2025-05-22T13:00:00Z"),
-            updatedAt: new Date("2025-06-03T10:30:00Z"),
-        },
-        {
-            id: "app-005",
-            job: jobs[3], // Product Manager
-            status: ApplicationStatus.PASSED,
-            createdAt: new Date("2025-04-10T09:00:00Z"),
-            updatedAt: new Date("2025-05-25T16:00:00Z"),
-        },
-        {
-            id: "app-006",
-            job: jobs[1], // UX/UI Designer (อีกใบ)
-            status: ApplicationStatus.INTERVIEWED,
-            createdAt: new Date("2025-05-01T10:00:00Z"),
-            updatedAt: new Date("2025-05-10T11:00:00Z"),
-        },
-    ]);
+    const [applications, setApplications] = useState<JobApplication[]>([]);
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (!user) return;
+        getApplications(user.uid).then(applications => {
+            setApplications(applications);
+        })
+    }, [user]);
+
+    const refreshApplications = async () => {
+        if (user) {
+            try {
+                const fetchedApplications = await getApplications(user.uid);
+                setApplications(fetchedApplications);
+            } catch (err) {
+                console.error("Error refreshing applications:", err);
+            }
+        }
+    };
 
     function handleDragEnd(event: DragEndEvent) {
         const {active, over} = event;
@@ -161,28 +119,6 @@ export default function JobBoard() {
         </Box>
     );
 
-    function createJob(formData: FormData) {
-        const formEntries = Object.fromEntries(formData.entries()) as Record<keyof JobFormData, string>;
-
-        const newJob: Job = {
-            title: formEntries.title,
-            description: formEntries.description,
-            company: formEntries.company,
-            url: formEntries.url,
-        };
-
-        const newApplication: JobApplication = {
-            id: `app-${Date.now()}`,
-            job: newJob,
-            status: ApplicationStatus.PENDING,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        };
-
-        setApplications(prevApplications => [...prevApplications, newApplication]);
-    }
-
-
     function JobCreateDialog() {
         return (
             <Dialog open={openCreate} onClose={handleClose} slotProps={{
@@ -191,7 +127,18 @@ export default function JobBoard() {
                     onSubmit: (event: FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
-                        createJob(formData);
+                        const formEntries = Object.fromEntries(formData.entries()) as Record<keyof JobFormData, string>;
+
+                        const newJob: Job = {
+                            title: formEntries.title,
+                            description: formEntries.description,
+                            company: formEntries.company,
+                            url: formEntries.url,
+                        };
+                        createJob(user!.uid, newJob).then(_ => {
+                            refreshApplications().then(()=>{});
+                        });
+
                         handleClose();
 
                     },
@@ -199,7 +146,7 @@ export default function JobBoard() {
             }}>
                 <DialogTitle>สร้างใบสมัครงานใหม่</DialogTitle>
                 <DialogContent>
-                    <DialogContentText sx={{ mb: 2 }}>
+                    <DialogContentText sx={{mb: 2}}>
                         กรุณากรอกรายละเอียดงานที่ต้องการสมัคร
                     </DialogContentText>
                     <TextField
@@ -255,4 +202,3 @@ export default function JobBoard() {
     }
 
 }
-

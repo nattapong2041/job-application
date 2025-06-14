@@ -1,5 +1,5 @@
 import {ApplicationStatus, Job, JobApplication} from "@/types";
-import {auth, db} from "@/firebase/firebase";
+import {db} from "@/firebase/firebase";
 import {
     addDoc,
     collection,
@@ -10,7 +10,6 @@ import {
     serverTimestamp,
     setDoc,
     Timestamp,
-    where
 } from "@firebase/firestore";
 
 export async function createJob(userId: string, jobData: Job) {

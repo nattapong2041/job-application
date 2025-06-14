@@ -143,7 +143,7 @@ export default function JobBoard() {
                             company: formEntries.company,
                             url: formEntries.url,
                         };
-                        createJob(user!.uid, newJob).then(_ => {
+                        createJob(user!.uid, newJob).then(() => {
                             refreshApplications().then(() => {
                             });
                         });

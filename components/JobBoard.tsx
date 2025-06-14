@@ -14,7 +14,7 @@ import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import StatusBoard from "@/components/StatusBoard";
 import {ApplicationStatus, getApplicationStatusValues, Job, JobApplication} from "@/types";
 import {FormEvent, useEffect, useState} from "react";
-import {createJob, getApplications} from "@/firebase/firestore-service";
+import {createJob, getApplications, updateApplication} from "@/firebase/firestore-service";
 import {onAuthStateChanged, User} from "firebase/auth";
 import {auth} from "@/firebase/firebase";
 
@@ -57,7 +57,7 @@ export default function JobBoard() {
         }
     };
 
-    function handleDragEnd(event: DragEndEvent) {
+    async function handleDragEnd(event: DragEndEvent) {
         const {active, over} = event;
 
         if (!over) return;
@@ -65,13 +65,21 @@ export default function JobBoard() {
         const jobId = active.id;
         const newStatus = over.id as ApplicationStatus;
 
-        setApplications(prevApplications =>
-            prevApplications.map(app =>
-                app.id === jobId
-                    ? {...app, status: newStatus}
-                    : app
-            )
-        );
+        applications.map(async (app) => {
+            if (app.id === jobId) {
+                if (user) {
+                    try {
+                        await updateApplication(user.uid, app.id, newStatus);
+                        refreshApplications().then(() => {
+                            }
+                        )
+                    } catch (err) {
+                        console.error("Error refreshing applications:", err);
+                    }
+                }
+
+            }
+        })
     }
 
     function handleCreateJob() {
@@ -136,7 +144,8 @@ export default function JobBoard() {
                             url: formEntries.url,
                         };
                         createJob(user!.uid, newJob).then(_ => {
-                            refreshApplications().then(()=>{});
+                            refreshApplications().then(() => {
+                            });
                         });
 
                         handleClose();

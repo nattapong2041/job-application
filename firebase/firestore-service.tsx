@@ -1,6 +1,17 @@
 import {ApplicationStatus, Job, JobApplication} from "@/types";
 import {auth, db} from "@/firebase/firebase";
-import {addDoc, collection, getDocs, query, serverTimestamp, Timestamp} from "@firebase/firestore";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    serverTimestamp,
+    setDoc,
+    Timestamp,
+    where
+} from "@firebase/firestore";
 
 export async function createJob(userId: string, jobData: Job) {
     if (!userId) {
@@ -45,4 +56,29 @@ export async function getApplications(userId: string) {
 
         }
     }).filter(application => application !== null) as JobApplication[];
+}
+
+export async function updateApplication(userId: string, applicationId: string, status: ApplicationStatus) {
+    if (!userId || !applicationId) {
+        return;
+    }
+    const docRef = doc(db, "users", userId, "applications", applicationId);
+
+    // ดึงเอกสาร
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {}
+    const data = docSnap.data();
+    if (!data) {
+        return;
+    }
+
+
+    const updatedApplication = {
+        job: data.job,
+        status: status,
+        createdAt: data.createdAt,
+        updatedAt: serverTimestamp()
+    };
+
+    await setDoc(docRef, updatedApplication);
 }

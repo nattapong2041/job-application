@@ -7,9 +7,11 @@ import {
     CardActions,
     CardContent,
     Chip,
-    Dialog, DialogActions,
+    Dialog,
+    DialogActions,
     DialogContent,
-    DialogTitle, IconButton,
+    DialogTitle,
+    IconButton,
     Typography
 } from "@mui/material";
 import LinkIcon from '@mui/icons-material/Link';
@@ -27,6 +29,11 @@ export default function JobCard({application}: { application: JobApplication }) 
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined;
 
+    function dateDiffInDays(updatedDate: Date) {
+        const currentDate = new Date();
+        const diffTime = Math.abs(currentDate.getTime() - updatedDate.getTime());
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
     return (
         <Card variant="elevation" ref={setNodeRef} component="div" {...listeners} {...attributes} sx={{
             mx: 2,
@@ -43,7 +50,7 @@ export default function JobCard({application}: { application: JobApplication }) 
                 </Typography>
             </CardContent>
             <CardActions sx={{justifyContent: 'space-between',}}>
-                <Chip label="2 days ago" size="small" color='info'/>
+                <Chip label={dateDiffInDays(application.updatedAt) + " days ago"} size="small" color='info' variant='outlined'/>
                 <Button
                     size="small"
                     onClick={() => {

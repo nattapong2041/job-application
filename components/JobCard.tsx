@@ -32,7 +32,7 @@ export default function JobCard({application, onEdit, onDelete}: JobCardProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const menuOpen = Boolean(anchorEl);
 
-    const {attributes, setNodeRef, transform} = useDraggable({
+    const {attributes, listeners, setNodeRef, transform} = useDraggable({
         id: application.id,
     });
     const style = transform ? {
@@ -75,6 +75,7 @@ export default function JobCard({application, onEdit, onDelete}: JobCardProps) {
             ...style
         }}>
             <CardHeader
+                {...listeners}
                 action={
                     <>
                         <IconButton aria-label="settings" onClick={handleMenuClick} onPointerDown={stopDrag}>
@@ -84,10 +85,9 @@ export default function JobCard({application, onEdit, onDelete}: JobCardProps) {
                             anchorEl={anchorEl}
                             open={menuOpen}
                             onClose={handleMenuClose}
-                            onClick={e => e.stopPropagation()}
                         >
-                            <MenuItem onClick={(e) => { handleMenuClose(e); onEdit(application); }}>แก้ไขตรงนี้น้า</MenuItem>
-                            <MenuItem onClick={(e) => { handleMenuClose(e); onDelete(application.id); }}>ลบ</MenuItem>
+                            <MenuItem onClick={(e) => { handleMenuClose(e); onEdit(application); }} onPointerDown={stopDrag}>แก้ไขตรงนี้น้า</MenuItem>
+                            <MenuItem onClick={(e) => { handleMenuClose(e); onDelete(application.id); }} onPointerDown={stopDrag}>ลบ</MenuItem>
                         </Menu>
                     </>
                 }

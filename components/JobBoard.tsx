@@ -147,10 +147,16 @@ export default function JobBoard() {
     function JobCreateDialog() {
         const isEdit = Boolean(editJob);
         return (
-            <Dialog open={openCreate} onClose={handleClose} slotProps={{
-                paper: {
-                    component: 'form',
-                    onSubmit: async (event: FormEvent<HTMLFormElement>) => {
+            <Dialog
+                open={openCreate}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') {
+                        handleClose();
+                    }
+                }}
+            >
+                <form
+                    onSubmit={async (event: FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const formEntries = Object.fromEntries(formData.entries()) as Record<keyof JobFormData, string>;
@@ -169,66 +175,66 @@ export default function JobBoard() {
                         }
                         await refreshApplications();
                         handleClose();
-                    },
-                },
-            }}>
-                <DialogTitle>{isEdit ? 'แก้ไขใบสมัครงาน' : 'สร้างใบสมัครงานใหม่'}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{mb: 2}}>
-                        {isEdit ? 'แก้ไขรายละเอียดงานที่ต้องการสมัคร' : 'กรุณากรอกรายละเอียดงานที่ต้องการสมัคร'}
-                    </DialogContentText>
-                    <TextField
-                        autoFocus
-                        required
-                        margin="dense"
-                        id="title"
-                        name="title"
-                        label="ตำแหน่งงาน"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        defaultValue={isEdit ? editJob?.job.title : ''}
-                    />
-                    <TextField
-                        required
-                        margin="dense"
-                        id="company"
-                        name="company"
-                        label="บริษัท"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        defaultValue={isEdit ? editJob?.job.company : ''}
-                    />
-                    <TextField
-                        required
-                        margin="dense"
-                        id="description"
-                        name="description"
-                        label="รายละเอียดงาน"
-                        type="text"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        variant="outlined"
-                        defaultValue={isEdit ? editJob?.job.description : ''}
-                    />
-                    <TextField
-                        required
-                        margin="dense"
-                        id="url"
-                        name="url"
-                        label="URL ประกาศรับสมัคร"
-                        type="url"
-                        fullWidth
-                        variant="outlined"
-                        defaultValue={isEdit ? editJob?.job.url : ''}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>ยกเลิก</Button>
-                    <Button type="submit" variant="contained">{isEdit ? 'แก้ไข' : 'สร้าง'}</Button>
-                </DialogActions>
+                    }}
+                >
+                    <DialogTitle>{isEdit ? 'แก้ไขใบสมัครงาน' : 'สร้างใบสมัครงานใหม่'}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText sx={{mb: 2}}>
+                            {isEdit ? 'แก้ไขรายละเอียดงานที่ต้องการสมัคร' : 'กรุณากรอกรายละเอียดงานที่ต้องการสมัคร'}
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            required
+                            margin="dense"
+                            id="title"
+                            name="title"
+                            label="ตำแหน่งงาน"
+                            type="text"
+                            fullWidth
+                            variant="outlined"
+                            defaultValue={isEdit ? editJob?.job.title : ''}
+                        />
+                        <TextField
+                            required
+                            margin="dense"
+                            id="company"
+                            name="company"
+                            label="บริษัท"
+                            type="text"
+                            fullWidth
+                            variant="outlined"
+                            defaultValue={isEdit ? editJob?.job.company : ''}
+                        />
+                        <TextField
+                            required
+                            margin="dense"
+                            id="description"
+                            name="description"
+                            label="รายละเอียดงาน"
+                            type="text"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            variant="outlined"
+                            defaultValue={isEdit ? editJob?.job.description : ''}
+                        />
+                        <TextField
+                            required
+                            margin="dense"
+                            id="url"
+                            name="url"
+                            label="URL ประกาศรับสมัคร"
+                            type="url"
+                            fullWidth
+                            variant="outlined"
+                            defaultValue={isEdit ? editJob?.job.url : ''}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose}>ยกเลิก</Button>
+                        <Button type="submit" variant="contained">{isEdit ? 'แก้ไข' : 'สร้าง'}</Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         );
     }

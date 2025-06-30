@@ -5,9 +5,11 @@ import {ApplicationStatus, ApplicationStatusText, JobApplication} from "@/types"
 
 type StatusBoardProps = {
     status: ApplicationStatus,
-    application: JobApplication[]
+    application: JobApplication[],
+    onEdit: (application: JobApplication) => void,
+    onDelete: (applicationId: string) => void,
 }
-export default function StatusBoard({status, application}: StatusBoardProps) {
+export default function StatusBoard({status, application, onEdit, onDelete}: StatusBoardProps) {
     const {isOver, setNodeRef} = useDroppable({
         id: status,
     });
@@ -40,7 +42,7 @@ export default function StatusBoard({status, application}: StatusBoardProps) {
                 {ApplicationStatusText[status]}
             </Typography>
             {application.map((app) =>
-                (<JobCard key={app.id} application={app}/>
+                (<JobCard key={app.id} application={app} onEdit={onEdit} onDelete={onDelete}/>
                 ))}
         </Paper>
     );

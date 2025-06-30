@@ -14,7 +14,7 @@ import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import StatusBoard from "@/components/StatusBoard";
 import {ApplicationStatus, getApplicationStatusValues, Job, JobApplication} from "@/types";
 import {FormEvent, useEffect, useState} from "react";
-import {createJob, getApplications, updateApplication} from "@/firebase/firestore-service";
+import {createJob, getApplications, updateApplication, deleteApplication} from "@/firebase/firestore-service";
 import {onAuthStateChanged, User} from "firebase/auth";
 import {auth} from "@/firebase/firebase";
 
@@ -31,6 +31,7 @@ export default function JobBoard() {
     const [openCreate, setOpenCreate] = useState(false);
     const [applications, setApplications] = useState<JobApplication[]>([]);
     const [user, setUser] = useState<User | null>(null);
+    const [editJob, setEditJob] = useState<JobApplication | null>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -84,10 +85,23 @@ export default function JobBoard() {
 
     function handleCreateJob() {
         setOpenCreate(true);
+        setEditJob(null);
     }
 
     function handleClose() {
         setOpenCreate(false);
+        setEditJob(null);
+    }
+
+    async function handleDeleteJob(applicationId: string) {
+        if (!user) return;
+        await deleteApplication(user.uid, applicationId);
+        await refreshApplications();
+    }
+
+    function handleEditJob(application: JobApplication) {
+        setEditJob(application);
+        setOpenCreate(true);
     }
 
     return (
@@ -119,7 +133,10 @@ export default function JobBoard() {
                             key={status}
                             status={status}
                             application={applications.filter((app) =>
-                                app.status === status)}/>
+                                app.status === status)}
+                            onEdit={handleEditJob}
+                            onDelete={handleDeleteJob}
+                        />
 
                     ))}
                 </DndContext>
@@ -128,11 +145,12 @@ export default function JobBoard() {
     );
 
     function JobCreateDialog() {
+        const isEdit = Boolean(editJob);
         return (
             <Dialog open={openCreate} onClose={handleClose} slotProps={{
                 paper: {
                     component: 'form',
-                    onSubmit: (event: FormEvent<HTMLFormElement>) => {
+                    onSubmit: async (event: FormEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const formEntries = Object.fromEntries(formData.entries()) as Record<keyof JobFormData, string>;
@@ -143,20 +161,21 @@ export default function JobBoard() {
                             company: formEntries.company,
                             url: formEntries.url,
                         };
-                        createJob(user!.uid, newJob).then(() => {
-                            refreshApplications().then(() => {
-                            });
-                        });
-
+                        if (isEdit && editJob) {
+                            // update job
+                            await updateApplication(user!.uid, editJob.id, editJob.status, newJob);
+                        } else {
+                            await createJob(user!.uid, newJob);
+                        }
+                        await refreshApplications();
                         handleClose();
-
                     },
                 },
             }}>
-                <DialogTitle>สร้างใบสมัครงานใหม่</DialogTitle>
+                <DialogTitle>{isEdit ? 'แก้ไขใบสมัครงาน' : 'สร้างใบสมัครงานใหม่'}</DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{mb: 2}}>
-                        กรุณากรอกรายละเอียดงานที่ต้องการสมัคร
+                        {isEdit ? 'แก้ไขรายละเอียดงานที่ต้องการสมัคร' : 'กรุณากรอกรายละเอียดงานที่ต้องการสมัคร'}
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -168,6 +187,7 @@ export default function JobBoard() {
                         type="text"
                         fullWidth
                         variant="outlined"
+                        defaultValue={isEdit ? editJob?.job.title : ''}
                     />
                     <TextField
                         required
@@ -178,6 +198,7 @@ export default function JobBoard() {
                         type="text"
                         fullWidth
                         variant="outlined"
+                        defaultValue={isEdit ? editJob?.job.company : ''}
                     />
                     <TextField
                         required
@@ -190,6 +211,7 @@ export default function JobBoard() {
                         multiline
                         rows={4}
                         variant="outlined"
+                        defaultValue={isEdit ? editJob?.job.description : ''}
                     />
                     <TextField
                         required
@@ -200,11 +222,12 @@ export default function JobBoard() {
                         type="url"
                         fullWidth
                         variant="outlined"
+                        defaultValue={isEdit ? editJob?.job.url : ''}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>ยกเลิก</Button>
-                    <Button type="submit" variant="contained">สร้าง</Button>
+                    <Button type="submit" variant="contained">{isEdit ? 'แก้ไข' : 'สร้าง'}</Button>
                 </DialogActions>
             </Dialog>
         );

@@ -10,6 +10,7 @@ import {
     serverTimestamp,
     setDoc,
     Timestamp,
+    deleteDoc,
 } from "@firebase/firestore";
 
 export async function createJob(userId: string, jobData: Job) {
@@ -57,7 +58,7 @@ export async function getApplications(userId: string) {
     }).filter(application => application !== null) as JobApplication[];
 }
 
-export async function updateApplication(userId: string, applicationId: string, status: ApplicationStatus) {
+export async function updateApplication(userId: string, applicationId: string, status: ApplicationStatus, newJob?: Job) {
     if (!userId || !applicationId) {
         return;
     }
@@ -71,13 +72,24 @@ export async function updateApplication(userId: string, applicationId: string, s
         return;
     }
 
-
     const updatedApplication = {
-        job: data.job,
+        job: newJob ? newJob : data.job,
         status: status,
         createdAt: data.createdAt,
         updatedAt: serverTimestamp()
     };
 
     await setDoc(docRef, updatedApplication);
+}
+
+export async function deleteApplication(userId: string, applicationId: string) {
+    if (!userId || !applicationId) {
+        return;
+    }
+    const docRef = doc(db, "users", userId, "applications", applicationId);
+    try {
+        await deleteDoc(docRef);
+    } catch (e) {
+        console.error("Error deleting document: ", e);
+    }
 }
